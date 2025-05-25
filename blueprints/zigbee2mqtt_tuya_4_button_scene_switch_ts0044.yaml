@@ -112,17 +112,18 @@ variables:
   command: "{{ trigger.payload }}"
   topic: "{{ trigger.topic }}"
   topic_device_name: "{{ topic.split('/')[1] | lower | replace(' ', '_') | replace('-', '_') }}"
+  switch_name: !input switch
 trigger:
   - platform: mqtt
     topic: zigbee2mqtt/+/action
 action:
   - service: system_log.write
     data:
-      message: 'Topic device name: {{ topic_device_name }}'
+      message: 'Topic device name: {{ topic_device_name == switch_name }}'
       level: info
   - service: system_log.write
     data:
-      message: 'Match condition: {{ topic_device_name == input.input_device_name }}'
+      message: 'Match condition: {{ topic_device_name == switch_name }}'
       level: info
   - choose:
       - conditions:

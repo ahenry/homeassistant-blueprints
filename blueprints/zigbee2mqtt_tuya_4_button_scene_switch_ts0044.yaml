@@ -29,13 +29,10 @@ blueprint:
   domain: automation
   input:
     switch:
-      name: TS0044 Switch
-      description: Tuya 4-Button Scene Switch to use
+      name: Device name
+      description: Exact Zigbee2MQTT device name (as seen in MQTT) for the Tuya 4-Button Scene Switch to use
       selector:
-        entity:
-          domain: sensor
-          integration: mqtt
-          multiple: false
+        text:
     button_one_short_press:
       name: Single Press - Button 1
       description: Action to run on button 1 (upper-left) single press
@@ -114,9 +111,6 @@ max_exceeded: silent
 variables:
   command: "{{ trigger.payload }}"
   topic: "{{ trigger.topic }}"
-  switch_name: !input switch
-  friendly_name: "{{ state_attr(switch_name, 'friendly_name') }}"
-  friendly_name_processed: "{{ friendly_name | lower | replace(' ', '_') | replace('-', '_') | replace('_action', '') }}"
   topic_device_name: "{{ topic.split('/')[1] | lower | replace(' ', '_') | replace('-', '_') }}"
 trigger:
   - platform: mqtt
@@ -124,24 +118,16 @@ trigger:
 action:
   - service: system_log.write
     data:
-      message: 'Received command {{ command }} from topic {{ topic }}'
-      level: info
-  - service: system_log.write
-    data:
-      message: 'Friendly name: {{ friendly_name }}, Processed: {{ friendly_name_processed }}'
-      level: info
-  - service: system_log.write
-    data:
       message: 'Topic device name: {{ topic_device_name }}'
       level: info
   - service: system_log.write
     data:
-      message: 'Match condition: {{ topic_device_name == friendly_name_processed }}'
+      message: 'Match condition: {{ topic_device_name == input.input_device_name }}'
       level: info
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ topic_device_name == friendly_name_processed }}"
+            value_template: "{{ topic_device_name == input.input_device_name }}"
         sequence:
           - service: system_log.write
             data:

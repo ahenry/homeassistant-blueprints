@@ -119,20 +119,20 @@ trigger:
 action:
   - service: system_log.write
     data:
-      message: 'Topic device name: {{ topic_device_name == switch_name }}'
+      message: 'Topic device name: {{ topic_device_name }}'
       level: info
   - service: system_log.write
     data:
-      message: 'Match condition: {{ topic_device_name == switch_name }}'
+      message: 'Match condition: {{ topic_device_name }} == {{ switch_name }}'
       level: info
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ topic_device_name == input.input_device_name }}"
+            value_template: "{{ topic_device_name == switch_name }}"
         sequence:
           - service: system_log.write
             data:
-              message: 'Matched device name: {{ friendly_name_processed }}'
+              message: 'Matched device name: {{ switch_name }}'
               level: info
           - choose:
               - conditions:
